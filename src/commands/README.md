@@ -1,0 +1,1 @@
+- **src/commands** — holds individual command files. This makes adding new commands or editing existing ones cleaner.

@@ -1,0 +1,39 @@
+{
+  "name": "zapmux",
+  "version": "1.0.0",
+  "description": "zapmux will help you create tmux session for your codebases",
+  "main": "./dist/index.mjs",
+  "scripts": {
+    "build": "pkgroll"
+  },
+  "bin": "./dist/index.mjs",
+  "type": "module",
+  "keywords": [
+    "tmux",
+    "zap"
+  ],
+  "module": "./dist/index.mjs",
+  "exports": {
+    "require": {
+      "default": "./dist/index.mjs"
+    },
+    "import": {
+      "default": "./dist/index.mjs"
+    }
+  },
+  "author": "jacobo jaramillo",
+  "license": "ISC",
+  "dependencies": {
+    "@types/figlet": "^1.5.8",
+    "chalk": "^5.3.0",
+    "commander": "^12.1.0",
+    "figlet": "^1.7.0",
+    "inquirer": "^10.0.1",
+    "ora": "^8.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "pkgroll": "^2.1.1",
+    "typescript": "^5.5.3"
+  }
+}
