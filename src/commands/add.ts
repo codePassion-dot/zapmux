@@ -40,7 +40,7 @@ export default async () => {
   const lastPathSegment = projectPath.split("/").pop();
 
   const projectName = await input({
-    message: `What is the name of your project ${lastPathSegment}`,
+    message: "What is the name of your project",
     default: lastPathSegment,
   });
 
