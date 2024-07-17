@@ -11,7 +11,7 @@ import remove from "./commands/remove";
 import edit from "./commands/edit";
 
 program
-  .version("0.1.2")
+  .version("0.2.0")
   .description(
     chalk.green(figlet.textSync("zapmux CLI", { horizontalLayout: "full" })),
   );
