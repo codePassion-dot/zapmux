@@ -2,24 +2,40 @@ import { input } from "@inquirer/prompts";
 import fs from "fs";
 import os from "os";
 import db from "../lib/db";
+import process from "process";
 
-export default async () => {
-  const projectPath = await input({
-    message: "Where is your project",
-    required: true,
-    validate: (input) => {
-      if (input[0] === "~") {
-        if (!fs.existsSync(input.replace("~", os.homedir()))) {
-          return "Path does not exist";
-        }
-        return true;
-      }
-      if (!fs.existsSync(input)) {
+const validateInput = (input: string) => {
+  switch (input[0]) {
+    case "":
+      return "This field is required";
+    case "~":
+      if (!fs.existsSync(input.replace("~", os.homedir()))) {
         return "Path does not exist";
       }
-      return true;
-    },
+
+    case ".":
+      if (!fs.existsSync(input.replace(".", process.cwd()))) {
+        return "Path does not exist";
+      }
+  }
+
+  if (!fs.existsSync(input)) {
+    return "Path does not exist";
+  }
+
+  return true;
+};
+
+export default async () => {
+  let projectPath = await input({
+    message: "Where is your project",
+    required: true,
+    validate: validateInput,
   });
+
+  if (projectPath === ".") {
+    projectPath = process.cwd();
+  }
 
   const lastPathSegment = projectPath.split("/").pop();
 
