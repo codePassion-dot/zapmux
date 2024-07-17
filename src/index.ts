@@ -1,9 +1,14 @@
 #!/usr/bin/env node
 
 import { program } from "commander";
-import inquirer from "inquirer";
 import figlet from "figlet";
 import chalk from "chalk";
+import start from "./commands/start";
+import choose from "./commands/choose";
+import list from "./commands/list";
+import add from "./commands/add";
+import remove from "./commands/remove";
+import edit from "./commands/edit";
 
 console.log(
   chalk.green(figlet.textSync("zapmux CLI", { horizontalLayout: "full" })),
@@ -12,59 +17,30 @@ console.log(
 program.version("1.0.0").description("zapmux CLI");
 
 program
-  .command("start <projectName>")
-  .action((projectName) => {
-    console.log(`Creating a new project called ${projectName}...`);
-  })
+  .command("start <projects...>")
+  .action(start)
   .description("Start a new tmux session for a saved project");
 
 program
   .command("choose")
-  .action(() => {
-    inquirer
-      .prompt([
-        {
-          type: "list",
-          name: "choice",
-          message: "Choose an option",
-          choices: [
-            { name: "Project 1", value: "project1" },
-            { name: "Project 2", value: "project2" },
-          ],
-        },
-      ])
-      .then((answers) => {
-        console.log(`You chose: ${answers.choice}`);
-      });
-  })
+  .action(choose)
   .description("Choose a saved project to start a tmux session");
 
-program
-  .command("list")
-  .action(() => {
-    console.log("Listing saved projects...");
-  })
-  .description("List all saved projects");
+program.command("list").action(list).description("List all saved projects");
 
 program
   .command("add")
-  .action(() => {
-    console.log("Adding a new project...");
-  })
+  .action(add)
   .description("Add a new project interactively");
 
 program
   .command("remove <projectName>")
-  .action(() => {
-    console.log("Removing a project...");
-  })
+  .action(remove)
   .description("Remove a project");
 
 program
   .command("edit <projectName>")
-  .action(() => {
-    console.log("Editing a project...");
-  })
+  .action(edit)
   .description("Edit a project");
 
 program.parse(process.argv);
