@@ -14,7 +14,7 @@ console.log(
   chalk.green(figlet.textSync("zapmux CLI", { horizontalLayout: "full" })),
 );
 
-program.version("1.0.0").description("zapmux CLI");
+program.version("0.1.2").description("zapmux CLI");
 
 program
   .command("start <projects...>")
