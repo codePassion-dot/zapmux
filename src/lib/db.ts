@@ -11,12 +11,27 @@ type ProjectWindow = {
 
 type Windows = Array<ProjectWindow>;
 
-const isValidProjectName = (
-  project: object | ProjectWindow,
-): project is ProjectWindow => {
+type Project = {
+  projectPath: string;
+  windows: Windows;
+};
+
+const isValidWindows = (windows: Windows | unknown): windows is Windows => {
   return (
-    typeof (project as ProjectWindow).windowName === "string" &&
-    "commandToRunOnStart" in (project as ProjectWindow)
+    Array.isArray(windows) &&
+    windows.every((window) => {
+      return (
+        typeof window?.windowName === "string" &&
+        "commandToRunOnStart" in window
+      );
+    })
+  );
+};
+
+const isValidProject = (project: object | Project): project is Project => {
+  return (
+    typeof (project as Project).projectPath === "string" &&
+    isValidWindows((project as Project).windows)
   );
 };
 
@@ -31,7 +46,7 @@ class Db {
     await this.ensureDbDirExists();
     try {
       await fsAsync.writeFile(
-        path.join(os.homedir(), `${this.zapMuxDir}/${projectName}.json`),
+        `${this.zapMuxDir}/${projectName}.json`,
         JSON.stringify(
           {
             projectPath,
@@ -57,7 +72,7 @@ class Db {
 
       const parsedProject = JSON.parse(project);
 
-      if (!isValidProjectName(parsedProject)) {
+      if (!isValidProject(parsedProject)) {
         throw new Error("Invalid project format");
       }
       return parsedProject;
