@@ -1,6 +1,6 @@
 {
   "name": "zapmux",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "zapmux will help you create tmux session for your codebases",
   "main": "./dist/index.mjs",
   "scripts": {
