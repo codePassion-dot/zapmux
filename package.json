@@ -5,7 +5,7 @@
   "main": "./dist/index.mjs",
   "repository": {
     "type": "git",
-    "url": "https://github.com/codePassion-dot/zapmux"
+    "url": "git+https://github.com/codePassion-dot/zapmux.git"
   },
   "scripts": {
     "build": "pkgroll"
