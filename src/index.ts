@@ -10,11 +10,11 @@ import add from "./commands/add";
 import remove from "./commands/remove";
 import edit from "./commands/edit";
 
-console.log(
-  chalk.green(figlet.textSync("zapmux CLI", { horizontalLayout: "full" })),
-);
-
-program.version("0.1.2").description("zapmux CLI");
+program
+  .version("0.1.2")
+  .description(
+    chalk.green(figlet.textSync("zapmux CLI", { horizontalLayout: "full" })),
+  );
 
 program
   .command("start <projects...>")
