@@ -20,7 +20,7 @@ export default async (projects: string[]) => {
     const projectContent = await db.read(projectName);
     const windows = projectContent.windows;
     await execAsync(
-      `tmux -u -f ${CONFIG} new-session -s ${projectName} -n ${windows[0].windowName} -d`,
+      `tmux -u -f ${CONFIG} new-session -c ${projectContent.projectPath} -s ${projectName} -n ${windows[0].windowName} -d`,
     );
     await execAsync(
       `tmux send-keys -t ${projectName}:${windows[0].windowName} '${windows[0].commandToRunOnStart}' Enter`,
@@ -28,7 +28,7 @@ export default async (projects: string[]) => {
 
     for (let i = 1; i < windows.length; i++) {
       await execAsync(
-        `tmux new-window -t ${projectName} -d -n ${windows[i].windowName}`,
+        `tmux new-window -t ${projectName} -c ${projectContent.projectPath} -d -n ${windows[i].windowName}`,
       );
       await execAsync(
         `tmux send-keys -t ${projectName}:${windows[i].windowName} '${windows[i].commandToRunOnStart}' Enter`,
