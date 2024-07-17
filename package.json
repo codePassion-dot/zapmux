@@ -6,7 +6,9 @@
   "scripts": {
     "build": "pkgroll"
   },
-  "bin": "./dist/index.mjs",
+  "bin": {
+    "zapmux": "dist/index.mjs"
+  },
   "type": "module",
   "keywords": [
     "tmux",
