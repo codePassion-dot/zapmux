@@ -3,6 +3,7 @@ import path from "path";
 
 import fsAsync from "fs/promises";
 import os from "os";
+import chalk from "chalk";
 
 type ProjectWindow = {
   windowName: string;
@@ -78,6 +79,21 @@ class Db {
       return parsedProject;
     } catch (error) {
       console.error("Project not found");
+      process.exit(1);
+    }
+  }
+
+  async readAll() {
+    try {
+      await this.ensureDbDirExists();
+      const projects = await fsAsync.readdir(this.zapMuxDir);
+      if (!projects.length) {
+        console.log(chalk.red("No projects found"));
+        process.exit(0);
+      }
+      return projects.map((project) => project.replace(".json", ""));
+    } catch (error) {
+      console.log("Something went wrong reading the projects");
       process.exit(1);
     }
   }
