@@ -1,8 +1,12 @@
 {
-  "name": "zapmux",
+  "name": "@codepassiondot/zapmux",
   "version": "0.1.0",
   "description": "zapmux will help you create tmux session for your codebases",
   "main": "./dist/index.mjs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codePassion-dot/zapmux"
+  },
   "scripts": {
     "build": "pkgroll"
   },
