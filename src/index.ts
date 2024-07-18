@@ -17,7 +17,7 @@ program
   );
 
 program
-  .command("start <projects...>")
+  .command("start [projects...]")
   .action(start)
   .description("Start a new tmux session for a saved project");
 
