@@ -12,18 +12,18 @@ const validateInput = (input: string) => {
       if (!fs.existsSync(input.replace("~", os.homedir()))) {
         return "Path does not exist";
       }
-
+      return true;
     case ".":
       if (!fs.existsSync(input.replace(".", process.cwd()))) {
         return "Path does not exist";
       }
+      return true;
+    default:
+      if (!fs.existsSync(input)) {
+        return "Path does not exist";
+      }
+      return true;
   }
-
-  if (!fs.existsSync(input)) {
-    return "Path does not exist";
-  }
-
-  return true;
 };
 
 export default async () => {
