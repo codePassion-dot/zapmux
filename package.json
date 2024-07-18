@@ -1,6 +1,6 @@
 {
   "name": "@codepassiondot/zapmux",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "zapmux will help you create tmux session for your codebases",
   "main": "./dist/index.mjs",
   "repository": {
