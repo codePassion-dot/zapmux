@@ -34,7 +34,7 @@ program
   .description("Add a new project interactively");
 
 program
-  .command("remove <projectName>")
+  .command("remove [projectName...]")
   .action(remove)
   .description("Remove a project");
 

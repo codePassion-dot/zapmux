@@ -59,7 +59,7 @@ class Db {
         { flag: "w+" },
       );
     } catch (error) {
-      console.error("Something went wrong saving the new project");
+      console.error(chalk.red("Something went wrong saving the new project"));
       process.exit(1);
     }
   }
@@ -78,7 +78,7 @@ class Db {
       }
       return parsedProject;
     } catch (error) {
-      console.error("Project not found");
+      console.error(chalk.red("Project not found"));
       process.exit(1);
     }
   }
@@ -94,6 +94,16 @@ class Db {
       return projects.map((project) => project.replace(".json", ""));
     } catch (error) {
       console.log("Something went wrong reading the projects");
+      process.exit(1);
+    }
+  }
+
+  async remove(projectName: string) {
+    try {
+      await fsAsync.unlink(`${this.zapMuxDir}/${projectName}.json`);
+      return projectName;
+    } catch (error) {
+      console.error(chalk.red("Project not found"));
       process.exit(1);
     }
   }
