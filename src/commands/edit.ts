@@ -1,9 +1,15 @@
 import db from "../utils/db";
 import { input, select } from "@inquirer/prompts";
 import { listTmuxSessions } from "../utils/tmux";
+import chalk from "chalk";
 
 const editProject = async (projectToEditName: string) => {
-  const projectToEditContent = await db.read(projectToEditName);
+  const [status, projectToEditContent] = await db.read(projectToEditName);
+
+  if (status === "error") {
+    console.log(chalk.red(`${projectToEditName} not found`));
+    process.exit(0);
+  }
 
   const newProjectName = await input({
     message: "What is the name of your project",
@@ -57,8 +63,8 @@ const editProject = async (projectToEditName: string) => {
 
 export default async (projectToEdit: string | undefined) => {
   const runningSessions = await listTmuxSessions();
+  const projects = await db.readAll();
   if (!projectToEdit) {
-    const projects = await db.readAll();
     const projectsThatAreNotRunning = projects.filter(
       (project) => !runningSessions.includes(project),
     );
@@ -70,8 +76,11 @@ export default async (projectToEdit: string | undefined) => {
       })),
     });
     await editProject(projectToEditName);
-  } else if (runningSessions.includes(projectToEdit)) {
-    console.log("Project is running, please stop it before editing");
+  } else if (
+    projects.includes(projectToEdit) &&
+    runningSessions.includes(projectToEdit)
+  ) {
+    console.log(chalk.red("Project is running, please stop it before editing"));
     process.exit(0);
   } else {
     await editProject(projectToEdit);

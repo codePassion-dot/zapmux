@@ -12,7 +12,10 @@ import {
 const CONFIG = path.join(os.homedir(), "/.tmux.conf");
 
 const startProject = async (projectName: string) => {
-  const projectContent = await db.read(projectName);
+  const [status, projectContent] = await db.read(projectName);
+  if (status === "error") {
+    return Promise.reject(projectName);
+  }
   const windows = projectContent.windows;
   await createTmuxSession({
     config: CONFIG,

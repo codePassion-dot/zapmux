@@ -2,17 +2,26 @@ import chalk from "chalk";
 import db from "../utils/db";
 import checkbox from "@inquirer/checkbox";
 
+const removeProject = async (projectName: string) => {
+  const [status] = await db.remove(projectName);
+  if (status === "success") {
+    return chalk.green(`Project ${projectName} removed`);
+  } else {
+    return Promise.reject(chalk.red(`Project ${projectName} not found`));
+  }
+};
+
 const removeProjects = async (projectsNames: string[]) => {
   const removeProjectsPromises = projectsNames.map((projectName) =>
-    db.remove(projectName),
+    removeProject(projectName),
   );
   const removedProjects = await Promise.allSettled(removeProjectsPromises);
 
   removedProjects.forEach((removedProject) => {
     if (removedProject.status === "fulfilled") {
-      console.log(chalk.green(`Project ${removedProject.value} removed`));
+      console.log(removedProject.value);
     } else {
-      console.log(chalk.red("Project not found"));
+      console.log(removedProject.reason);
     }
   });
 };

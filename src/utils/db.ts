@@ -73,7 +73,9 @@ class Db {
     }
   }
 
-  async read(projectName: string) {
+  async read(
+    projectName: string,
+  ): Promise<["error", string] | ["success", Project]> {
     try {
       const project = await fsAsync.readFile(
         `${this.zapMuxDir}/${projectName}.json`,
@@ -83,12 +85,11 @@ class Db {
       const parsedProject = JSON.parse(project);
 
       if (!isValidProject(parsedProject)) {
-        throw new Error("Invalid project format");
+        return ["error", "Invalid project format"];
       }
-      return parsedProject;
+      return ["success", parsedProject];
     } catch (error) {
-      console.error(chalk.red("Project not found"));
-      process.exit(1);
+      return ["error", chalk.red("Project not found")];
     }
   }
 
@@ -107,13 +108,14 @@ class Db {
     }
   }
 
-  async remove(projectName: string) {
+  async remove(
+    projectName: string,
+  ): Promise<["success", undefined] | ["error", string]> {
     try {
       await fsAsync.unlink(`${this.zapMuxDir}/${projectName}.json`);
-      return projectName;
+      return ["success", undefined];
     } catch (error) {
-      console.error(chalk.red("Project not found"));
-      process.exit(1);
+      return ["error", chalk.red("Project not found")];
     }
   }
 }
