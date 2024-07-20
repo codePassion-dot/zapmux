@@ -1,6 +1,6 @@
 import path from "path";
 import db from "../lib/db";
-import child_process from "child_process";
+import child_process, { execSync } from "child_process";
 import os from "os";
 import { checkbox } from "@inquirer/prompts";
 
@@ -54,17 +54,34 @@ const startProjects = async (projects: string[]) => {
 };
 
 export default async (projects: string[]) => {
+  const runningSessions = execSync('tmux list-sessions -F "#S"');
   if (projects.length === 0) {
     const existingProjects = await db.readAll();
+    const projecstThatAreNotRunning = existingProjects.filter(
+      (project) => !runningSessions.includes(project),
+    );
     const projectsToStart = await checkbox({
       message: "Choose projects to start",
-      choices: existingProjects.map((project) => ({
+      choices: projecstThatAreNotRunning.map((project) => ({
         name: project,
         value: project,
       })),
     });
     await startProjects(projectsToStart);
   } else {
-    await startProjects(projects);
+    const projectsThatAreNotRunning = projects.filter(
+      (project) => !runningSessions.includes(project),
+    );
+    await startProjects(projectsThatAreNotRunning);
+    if (projectsThatAreNotRunning.length !== projects.length) {
+      const projectsThatAreRunning = projects.filter((project) =>
+        runningSessions.includes(project),
+      );
+      console.log(
+        projectsThatAreRunning
+          .map((project) => `${project} is already running`)
+          .join("\n"),
+      );
+    }
   }
 };
