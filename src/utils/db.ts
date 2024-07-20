@@ -4,6 +4,7 @@ import path from "path";
 import fsAsync from "fs/promises";
 import os from "os";
 import chalk from "chalk";
+import { listTmuxSessions } from "./tmux";
 
 type ProjectWindow = {
   windowName: string;
@@ -77,6 +78,10 @@ class Db {
     projectName: string,
   ): Promise<["error", string] | ["success", Project]> {
     try {
+      if (!(await this.exists(projectName))) {
+        return ["error", `Project ${projectName} not found`];
+      }
+
       const project = await fsAsync.readFile(
         `${this.zapMuxDir}/${projectName}.json`,
         "utf-8",
@@ -85,11 +90,14 @@ class Db {
       const parsedProject = JSON.parse(project);
 
       if (!isValidProject(parsedProject)) {
-        return ["error", "Invalid project format"];
+        return ["error", `Invalid project format for ${projectName}`];
       }
       return ["success", parsedProject];
     } catch (error) {
-      return ["error", chalk.red("Project not found")];
+      return [
+        "error",
+        `Something went wrong reading the project ${projectName}`,
+      ];
     }
   }
 
@@ -103,7 +111,7 @@ class Db {
       }
       return projects.map((project) => project.replace(".json", ""));
     } catch (error) {
-      console.log("Something went wrong reading the projects");
+      console.log(chalk.red("Something went wrong reading the projects"));
       process.exit(1);
     }
   }
@@ -112,10 +120,20 @@ class Db {
     projectName: string,
   ): Promise<["success", undefined] | ["error", string]> {
     try {
+      if (!(await this.exists(projectName))) {
+        return ["error", `Project ${projectName} not found`];
+      }
+
+      if ((await listTmuxSessions()).includes(projectName)) {
+        return ["error", `Project ${projectName} is running`];
+      }
       await fsAsync.unlink(`${this.zapMuxDir}/${projectName}.json`);
       return ["success", undefined];
     } catch (error) {
-      return ["error", chalk.red("Project not found")];
+      return [
+        "error",
+        `Something went wrong removing the project ${projectName}`,
+      ];
     }
   }
 }

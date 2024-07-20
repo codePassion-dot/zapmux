@@ -3,11 +3,11 @@ import db from "../utils/db";
 import checkbox from "@inquirer/checkbox";
 
 const removeProject = async (projectName: string) => {
-  const [status] = await db.remove(projectName);
+  const [status, response] = await db.remove(projectName);
   if (status === "success") {
-    return chalk.green(`Project ${projectName} removed`);
+    return `Project ${projectName} removed`;
   } else {
-    return Promise.reject(chalk.red(`Project ${projectName} not found`));
+    return response;
   }
 };
 
@@ -19,9 +19,9 @@ const removeProjects = async (projectsNames: string[]) => {
 
   removedProjects.forEach((removedProject) => {
     if (removedProject.status === "fulfilled") {
-      console.log(removedProject.value);
+      console.log(chalk.green(removedProject.value));
     } else {
-      console.log(removedProject.reason);
+      console.log(chalk.red(removedProject.reason));
     }
   });
 };

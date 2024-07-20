@@ -8,18 +8,22 @@ import {
   listTmuxSessions,
   sendKeysToWindow,
 } from "../utils/tmux";
+import chalk from "chalk";
 
 const CONFIG = path.join(os.homedir(), "/.tmux.conf");
 
 const startProject = async (projectName: string) => {
-  const [status, projectContent] = await db.read(projectName);
+  const [status, response] = await db.read(projectName);
   if (status === "error") {
-    return Promise.reject(projectName);
+    return Promise.reject(response);
   }
-  const windows = projectContent.windows;
+  if ((await listTmuxSessions()).includes(projectName)) {
+    return Promise.reject(`${projectName} already running`);
+  }
+  const windows = response.windows;
   await createTmuxSession({
     config: CONFIG,
-    path: projectContent.projectPath,
+    path: response.projectPath,
     sessionName: projectName,
     initialWindowName: windows[0].windowName,
   });
@@ -33,7 +37,7 @@ const startProject = async (projectName: string) => {
   for (let i = 1; i < windows.length; i++) {
     await createWindowForTmuxSession({
       sessionName: projectName,
-      path: projectContent.projectPath,
+      path: response.projectPath,
       windowName: windows[i].windowName,
     });
     await sendKeysToWindow({
@@ -42,7 +46,7 @@ const startProject = async (projectName: string) => {
       command: windows[i].commandToRunOnStart,
     });
   }
-  return projectName;
+  return `Project ${projectName} started`;
 };
 
 const startProjects = async (projects: string[]) => {
@@ -54,16 +58,16 @@ const startProjects = async (projects: string[]) => {
 
   startedProjects.forEach((startedProject) => {
     if (startedProject.status === "fulfilled") {
-      console.log(`Project ${startedProject.value} started`);
+      console.log(chalk.green(startedProject.value));
     } else {
-      console.log(`Project ${startedProject.reason} not found`);
+      console.log(chalk.red(startedProject.reason));
     }
   });
 };
 
 export default async (projects: string[]) => {
-  const runningSessions = await listTmuxSessions();
   if (projects.length === 0) {
+    const runningSessions = await listTmuxSessions();
     const existingProjects = await db.readAll();
     const projecstThatAreNotRunning = existingProjects.filter(
       (project) => !runningSessions.includes(project),
@@ -77,19 +81,6 @@ export default async (projects: string[]) => {
     });
     await startProjects(projectsToStart);
   } else {
-    const projectsThatAreNotRunning = projects.filter(
-      (project) => !runningSessions.includes(project),
-    );
-    await startProjects(projectsThatAreNotRunning);
-    if (projectsThatAreNotRunning.length !== projects.length) {
-      const projectsThatAreRunning = projects.filter((project) =>
-        runningSessions.includes(project),
-      );
-      console.log(
-        projectsThatAreRunning
-          .map((project) => `${project} is already running`)
-          .join("\n"),
-      );
-    }
+    await startProjects(projects);
   }
 };
