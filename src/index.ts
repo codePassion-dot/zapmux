@@ -9,6 +9,7 @@ import list from "./commands/list";
 import add from "./commands/add";
 import remove from "./commands/remove";
 import edit from "./commands/edit";
+import stop from "./commands/stop";
 
 program
   .version("0.4.0")
@@ -42,5 +43,10 @@ program
   .command("edit [projectName]")
   .action(edit)
   .description("Edit a project");
+
+program
+  .command("stop [projectName]")
+  .action(stop)
+  .description("Stop a project if it has a running tmux session");
 
 program.parse(process.argv);

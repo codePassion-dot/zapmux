@@ -64,6 +64,15 @@ class Db {
     }
   }
 
+  async exists(projectName: string) {
+    try {
+      await fsAsync.access(`${this.zapMuxDir}/${projectName}.json`);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
   async read(projectName: string) {
     try {
       const project = await fsAsync.readFile(
