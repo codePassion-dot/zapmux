@@ -39,7 +39,7 @@ program
   .description("Remove a project");
 
 program
-  .command("edit <projectName>")
+  .command("edit [projectName]")
   .action(edit)
   .description("Edit a project");
 
