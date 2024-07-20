@@ -23,7 +23,7 @@ program
   .description("Start a new tmux session for a saved project");
 
 program
-  .command("choose")
+  .command("choose [projectName]")
   .action(choose)
   .description("Choose a saved project to start a tmux session");
 

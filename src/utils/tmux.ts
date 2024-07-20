@@ -1,3 +1,4 @@
+import { spawn } from "child_process";
 import { execAsync } from "./child-process";
 
 export const listTmuxSessions = async () => {
@@ -56,4 +57,29 @@ export const sendKeysToWindow = async ({
 
 export const killTmuxSession = async (sessionName: string) => {
   await execAsync(`tmux kill-session -t ${sessionName}`);
+};
+
+export const attachToTmuxSession = (sessionName: string) => {
+  let tmux;
+  if (process.env.TMUX) {
+    tmux = spawn("tmux", ["switch-client", "-t", sessionName], {
+      stdio: "inherit",
+    });
+  } else {
+    tmux = spawn("tmux", ["attach-session", "-t", sessionName], {
+      stdio: "inherit",
+    });
+  }
+
+  tmux.on("close", (code) => {
+    if (code === 0) {
+      console.log(`Attached to tmux session '${sessionName}' successfully.`);
+    } else {
+      console.error(`tmux process exited with code ${code}.`);
+    }
+  });
+
+  tmux.on("error", (err) => {
+    console.error(`Failed to start tmux: ${err.message}`);
+  });
 };
