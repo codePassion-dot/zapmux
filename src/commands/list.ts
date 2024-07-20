@@ -1,12 +1,10 @@
 import chalk from "chalk";
 import db from "../lib/db";
-import { execSync } from "child_process";
+import { listTmuxSessions } from "../utils/tmux";
 
 export default async () => {
   const projectsNames = await db.readAll();
-  const runningSessions = execSync('tmux list-sessions -F "#S"')
-    .toString()
-    .split("\n");
+  const runningSessions = await listTmuxSessions();
   console.log(
     projectsNames
       .map((projectName) =>

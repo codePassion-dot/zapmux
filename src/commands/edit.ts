@@ -1,6 +1,6 @@
-import { execSync } from "child_process";
 import db from "../lib/db";
 import { input, select } from "@inquirer/prompts";
+import { listTmuxSessions } from "../utils/tmux";
 
 const editProject = async (projectToEditName: string) => {
   const projectToEditContent = await db.read(projectToEditName);
@@ -56,7 +56,7 @@ const editProject = async (projectToEditName: string) => {
 };
 
 export default async (projectToEdit: string | undefined) => {
-  const runningSessions = execSync('tmux list-sessions -F "#S"');
+  const runningSessions = await listTmuxSessions();
   if (!projectToEdit) {
     const projects = await db.readAll();
     const projectsThatAreNotRunning = projects.filter(

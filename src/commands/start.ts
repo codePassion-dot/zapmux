@@ -1,38 +1,43 @@
 import path from "path";
 import db from "../lib/db";
-import child_process, { execSync } from "child_process";
 import os from "os";
 import { checkbox } from "@inquirer/prompts";
-
-const execAsync = (command: string) =>
-  new Promise((resolve, reject) => {
-    child_process.exec(command, (error, stdout, stderr) => {
-      if (error) {
-        reject(error);
-      }
-      resolve(stdout);
-    });
-  });
+import {
+  createTmuxSession,
+  createWindowForTmuxSession,
+  listTmuxSessions,
+  sendKeysToWindow,
+} from "../utils/tmux";
 
 const CONFIG = path.join(os.homedir(), "/.tmux.conf");
 
 const startProject = async (projectName: string) => {
   const projectContent = await db.read(projectName);
   const windows = projectContent.windows;
-  await execAsync(
-    `tmux -u -f ${CONFIG} new-session -c ${projectContent.projectPath} -s ${projectName} -n ${windows[0].windowName} -d`,
-  );
-  await execAsync(
-    `tmux send-keys -t ${projectName}:${windows[0].windowName} '${windows[0].commandToRunOnStart}' Enter`,
-  );
+  await createTmuxSession({
+    config: CONFIG,
+    path: projectContent.projectPath,
+    sessionName: projectName,
+    initialWindowName: windows[0].windowName,
+  });
+
+  await sendKeysToWindow({
+    sessionName: projectName,
+    windowName: windows[0].windowName,
+    command: windows[0].commandToRunOnStart,
+  });
 
   for (let i = 1; i < windows.length; i++) {
-    await execAsync(
-      `tmux new-window -t ${projectName} -c ${projectContent.projectPath} -d -n ${windows[i].windowName}`,
-    );
-    await execAsync(
-      `tmux send-keys -t ${projectName}:${windows[i].windowName} '${windows[i].commandToRunOnStart}' Enter`,
-    );
+    await createWindowForTmuxSession({
+      sessionName: projectName,
+      path: projectContent.projectPath,
+      windowName: windows[i].windowName,
+    });
+    await sendKeysToWindow({
+      sessionName: projectName,
+      windowName: windows[i].windowName,
+      command: windows[i].commandToRunOnStart,
+    });
   }
   return projectName;
 };
@@ -54,7 +59,7 @@ const startProjects = async (projects: string[]) => {
 };
 
 export default async (projects: string[]) => {
-  const runningSessions = execSync('tmux list-sessions -F "#S"');
+  const runningSessions = await listTmuxSessions();
   if (projects.length === 0) {
     const existingProjects = await db.readAll();
     const projecstThatAreNotRunning = existingProjects.filter(
