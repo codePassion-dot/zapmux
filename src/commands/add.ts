@@ -1,7 +1,7 @@
 import { input } from "@inquirer/prompts";
 import fs from "fs";
 import os from "os";
-import db from "../lib/db";
+import db from "../utils/db";
 import process from "process";
 
 const validateInput = (input: string) => {

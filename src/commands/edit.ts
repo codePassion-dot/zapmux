@@ -1,4 +1,4 @@
-import db from "../lib/db";
+import db from "../utils/db";
 import { input, select } from "@inquirer/prompts";
 import { listTmuxSessions } from "../utils/tmux";
 

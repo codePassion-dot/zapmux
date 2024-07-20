@@ -1,5 +1,5 @@
 import { select } from "@inquirer/prompts";
-import db from "../lib/db";
+import db from "../utils/db";
 import { attachToTmuxSession, listTmuxSessions } from "../utils/tmux";
 
 export default async (project: string | undefined) => {

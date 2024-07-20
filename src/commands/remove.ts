@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import db from "../lib/db";
+import db from "../utils/db";
 import checkbox from "@inquirer/checkbox";
 
 const removeProjects = async (projectsNames: string[]) => {

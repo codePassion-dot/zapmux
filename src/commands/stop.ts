@@ -1,4 +1,4 @@
-import db from "../lib/db";
+import db from "../utils/db";
 import { checkbox } from "@inquirer/prompts";
 import chalk from "chalk";
 import { killTmuxSession, listTmuxSessions } from "../utils/tmux";

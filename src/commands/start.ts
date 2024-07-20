@@ -1,5 +1,5 @@
 import path from "path";
-import db from "../lib/db";
+import db from "../utils/db";
 import os from "os";
 import { checkbox } from "@inquirer/prompts";
 import {
