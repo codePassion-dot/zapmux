@@ -28,7 +28,7 @@ const removeProjects = async (projectsNames: string[]) => {
 
 export default async (projectsNames: string[]) => {
   if (projectsNames.length === 0) {
-    const existingProjects = await db.readAll();
+    const existingProjects = await db.readAllNames();
     const projectsToRemove = await checkbox({
       message: "Choose projects to remove",
       choices: existingProjects.map((project) => ({

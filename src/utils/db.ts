@@ -101,7 +101,7 @@ class Db {
     }
   }
 
-  async readAll() {
+  async readAllNames() {
     try {
       await this.ensureDbDirExists();
       const projects = await fsAsync.readdir(this.zapMuxDir);

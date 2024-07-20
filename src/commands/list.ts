@@ -3,7 +3,7 @@ import db from "../utils/db";
 import { listTmuxSessions } from "../utils/tmux";
 
 export default async () => {
-  const projectsNames = await db.readAll();
+  const projectsNames = await db.readAllNames();
   const runningSessions = await listTmuxSessions();
   console.log(
     projectsNames

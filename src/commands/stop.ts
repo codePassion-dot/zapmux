@@ -6,7 +6,7 @@ import { killTmuxSession, listTmuxSessions } from "../utils/tmux";
 export default async (projectName: string | undefined) => {
   const runningSessions = await listTmuxSessions();
   if (!projectName) {
-    const projects = await db.readAll();
+    const projects = await db.readAllNames();
     const runningProjects = projects.filter((project) =>
       runningSessions.includes(project),
     );

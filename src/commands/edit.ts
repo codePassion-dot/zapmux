@@ -63,7 +63,7 @@ const editProject = async (projectToEditName: string) => {
 
 export default async (projectToEdit: string | undefined) => {
   const runningSessions = await listTmuxSessions();
-  const projects = await db.readAll();
+  const projects = await db.readAllNames();
   if (!projectToEdit) {
     const projectsThatAreNotRunning = projects.filter(
       (project) => !runningSessions.includes(project),

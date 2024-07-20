@@ -68,7 +68,7 @@ const startProjects = async (projects: string[]) => {
 export default async (projects: string[]) => {
   if (projects.length === 0) {
     const runningSessions = await listTmuxSessions();
-    const existingProjects = await db.readAll();
+    const existingProjects = await db.readAllNames();
     const projecstThatAreNotRunning = existingProjects.filter(
       (project) => !runningSessions.includes(project),
     );

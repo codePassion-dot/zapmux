@@ -4,7 +4,7 @@ import { attachToTmuxSession, listTmuxSessions } from "../utils/tmux";
 
 export default async (project: string | undefined) => {
   const runningSessions = await listTmuxSessions();
-  const projects = await db.readAll();
+  const projects = await db.readAllNames();
   if (!project) {
     const runningProjects = projects.filter((project) =>
       runningSessions.includes(project),
