@@ -3,27 +3,42 @@ import fs from "fs";
 import os from "os";
 import db from "../utils/db";
 import process from "process";
+import path from "path";
 
 const validateInput = (input: string) => {
-  switch (input[0]) {
-    case "":
-      return "This field is required";
-    case "~":
-      if (!fs.existsSync(input.replace("~", os.homedir()))) {
-        return "Path does not exist";
-      }
-      return true;
-    case ".":
-      if (!fs.existsSync(input.replace(".", process.cwd()))) {
-        return "Path does not exist";
-      }
-      return true;
-    default:
-      if (!fs.existsSync(input)) {
-        return "Path does not exist";
-      }
-      return true;
+  if (!input) return "This field is required";
+
+  if (input.startsWith("~")) {
+    const expandedPath = input.replace("~", os.homedir());
+    const resolvedPath = path.resolve(expandedPath);
+    if (!fs.existsSync(resolvedPath)) {
+      return "Path does not exist";
+    }
+    return true;
   }
+
+  if (input.startsWith("..")) {
+    const resolvedPath = path.resolve(input);
+    if (!fs.existsSync(resolvedPath)) {
+      return "Path does not exist";
+    }
+    return true;
+  }
+
+  if (input.startsWith(".")) {
+    const expandedPath = input.replace(".", process.cwd());
+    const resolvedPath = path.resolve(expandedPath);
+    if (!fs.existsSync(resolvedPath)) {
+      return "Path does not exist";
+    }
+    return true;
+  }
+
+  const resolvedPath = path.resolve(input);
+  if (!fs.existsSync(resolvedPath)) {
+    return "Path does not exist";
+  }
+  return true;
 };
 
 export default async () => {
