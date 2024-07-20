@@ -1,3 +1,4 @@
+import { execSync } from "child_process";
 import db from "../lib/db";
 import { input, select } from "@inquirer/prompts";
 
@@ -55,16 +56,23 @@ const editProject = async (projectToEditName: string) => {
 };
 
 export default async (projectToEdit: string | undefined) => {
+  const runningSessions = execSync('tmux list-sessions -F "#S"');
   if (!projectToEdit) {
     const projects = await db.readAll();
+    const projectsThatAreNotRunning = projects.filter(
+      (project) => !runningSessions.includes(project),
+    );
     const projectToEditName = await select({
       message: "Choose a project to edit",
-      choices: projects.map((project) => ({
+      choices: projectsThatAreNotRunning.map((project) => ({
         name: project,
         value: project,
       })),
     });
     await editProject(projectToEditName);
+  } else if (runningSessions.includes(projectToEdit)) {
+    console.log("Project is running, please stop it before editing");
+    process.exit(0);
   } else {
     await editProject(projectToEdit);
   }
