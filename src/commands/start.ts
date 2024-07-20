@@ -9,21 +9,35 @@ import {
   sendKeysToWindow,
 } from "../utils/tmux";
 import chalk from "chalk";
+import { getResolvedPath } from "../utils/path";
 
 const CONFIG = path.join(os.homedir(), "/.tmux.conf");
 
-const startProject = async (projectName: string) => {
-  const [status, response] = await db.read(projectName);
-  if (status === "error") {
-    return Promise.reject(response);
+const startProject = async (projectNameOrPath: string) => {
+  let project,
+    projectName = projectNameOrPath;
+  const [resolvedPathStatus] = getResolvedPath(projectNameOrPath);
+  if (resolvedPathStatus === 200) {
+    const [status, response] = await db.readByPath(projectNameOrPath);
+    if (status === "error") {
+      return Promise.reject(response);
+    }
+    projectName = response.name;
+    project = response;
+  } else {
+    const [status, response] = await db.read(projectNameOrPath);
+    if (status === "error") {
+      return Promise.reject(response);
+    }
+    if ((await listTmuxSessions()).includes(projectNameOrPath)) {
+      return Promise.reject(`${projectNameOrPath} already running`);
+    }
+    project = response;
   }
-  if ((await listTmuxSessions()).includes(projectName)) {
-    return Promise.reject(`${projectName} already running`);
-  }
-  const windows = response.windows;
+  const windows = project.windows;
   await createTmuxSession({
     config: CONFIG,
-    path: response.projectPath,
+    path: project.projectPath,
     sessionName: projectName,
     initialWindowName: windows[0].windowName,
   });
@@ -37,7 +51,7 @@ const startProject = async (projectName: string) => {
   for (let i = 1; i < windows.length; i++) {
     await createWindowForTmuxSession({
       sessionName: projectName,
-      path: response.projectPath,
+      path: project.projectPath,
       windowName: windows[i].windowName,
     });
     await sendKeysToWindow({

@@ -5,6 +5,7 @@ import fsAsync from "fs/promises";
 import os from "os";
 import chalk from "chalk";
 import { listTmuxSessions } from "./tmux";
+import { getResolvedPath } from "./path";
 
 type ProjectWindow = {
   windowName: string;
@@ -72,6 +73,46 @@ class Db {
     } catch (error) {
       return false;
     }
+  }
+
+  async readByPath(
+    projectPath: string,
+  ): Promise<["error", string] | ["success", Project & { name: string }]> {
+    try {
+      const [resolvedPathStatus] = getResolvedPath(projectPath);
+      if (resolvedPathStatus !== 200) {
+        return ["error", `Invalid path ${projectPath}`];
+      }
+      const projects = await this.readAll();
+      const project = projects.find((project) => {
+        const [_existingProjectPathStatus, existingProjectPath] =
+          getResolvedPath(project.projectPath);
+        const [_requestedProjectPathStatus, requestedProjectPath] =
+          getResolvedPath(projectPath);
+        return existingProjectPath === requestedProjectPath;
+      });
+      if (!project) {
+        return ["error", `Project with path ${projectPath} not found`];
+      }
+      return ["success", project];
+    } catch (error) {
+      return [
+        "error",
+        `Something went wrong reading the project with path ${projectPath}`,
+      ];
+    }
+  }
+
+  async readAll() {
+    const projectsNames = await this.readAllNames();
+    const projects = [];
+    for (const projectName of projectsNames) {
+      const [status, project] = await this.read(projectName);
+      if (status === "success") {
+        projects.push({ name: projectName, ...project });
+      }
+    }
+    return projects;
   }
 
   async read(

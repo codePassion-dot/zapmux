@@ -1,51 +1,22 @@
 import { input } from "@inquirer/prompts";
-import fs from "fs";
-import os from "os";
 import db from "../utils/db";
 import process from "process";
-import path from "path";
-
-const validateInput = (input: string) => {
-  if (!input) return "This field is required";
-
-  if (input.startsWith("~")) {
-    const expandedPath = input.replace("~", os.homedir());
-    const resolvedPath = path.resolve(expandedPath);
-    if (!fs.existsSync(resolvedPath)) {
-      return "Path does not exist";
-    }
-    return true;
-  }
-
-  if (input.startsWith("..")) {
-    const resolvedPath = path.resolve(input);
-    if (!fs.existsSync(resolvedPath)) {
-      return "Path does not exist";
-    }
-    return true;
-  }
-
-  if (input.startsWith(".")) {
-    const expandedPath = input.replace(".", process.cwd());
-    const resolvedPath = path.resolve(expandedPath);
-    if (!fs.existsSync(resolvedPath)) {
-      return "Path does not exist";
-    }
-    return true;
-  }
-
-  const resolvedPath = path.resolve(input);
-  if (!fs.existsSync(resolvedPath)) {
-    return "Path does not exist";
-  }
-  return true;
-};
+import { getResolvedPath } from "../utils/path";
 
 export default async () => {
   let projectPath = await input({
     message: "Where is your project",
     required: true,
-    validate: validateInput,
+    validate: (input) => {
+      const [status] = getResolvedPath(input);
+      if (status === 400) {
+        return "This field is required";
+      }
+      if (status === 404) {
+        return "Path does not exist";
+      }
+      return true;
+    },
   });
 
   if (projectPath === ".") {
