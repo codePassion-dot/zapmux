@@ -7,7 +7,7 @@ const removeProject = async (projectName: string) => {
   if (status === "success") {
     return `Project ${projectName} removed`;
   } else {
-    return response;
+    return Promise.reject(response);
   }
 };
 

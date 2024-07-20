@@ -19,16 +19,17 @@ export default async (projectName: string | undefined) => {
     });
     for (const project of projectsToStop) {
       await killTmuxSession(project);
+      console.log(chalk.green(`Project ${project} stopped`));
     }
   } else {
     const projectExists = await db.exists(projectName);
     if (!projectExists) {
-      console.log(chalk.red("Project not found"));
+      console.log(chalk.red(`Project ${projectName} not found`));
       process.exit(0);
     }
     const projectIsRunning = runningSessions.includes(projectName);
     if (!projectIsRunning) {
-      console.log(chalk.red("Project is not running"));
+      console.log(chalk.red(`Project ${projectName} is not running`));
       process.exit(0);
     }
     await killTmuxSession(projectName);
