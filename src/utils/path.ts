@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import os from "os";
 
-export const getResolvedPath = (input: string) => {
+export const getResolvedPath = (input: string): [number, string] => {
   if (!input) return [400, "input can not be falsy"];
 
   if (input.startsWith("~")) {

@@ -1,10 +1,9 @@
 import { input } from "@inquirer/prompts";
 import db from "../utils/db";
-import process from "process";
 import { getResolvedPath } from "../utils/path";
 
 export default async () => {
-  let projectPath = await input({
+  const projectPath = await input({
     message: "Where is your project",
     required: true,
     validate: (input) => {
@@ -17,13 +16,18 @@ export default async () => {
       }
       return true;
     },
+    transformer: (input, { isFinal }) => {
+      if (isFinal) {
+        const [_, resolvedPath] = getResolvedPath(input);
+        return resolvedPath;
+      }
+      return input;
+    },
   });
 
-  if (projectPath === ".") {
-    projectPath = process.cwd();
-  }
+  const [_, expandedPath] = getResolvedPath(projectPath);
 
-  const lastPathSegment = projectPath.split("/").pop();
+  const lastPathSegment = expandedPath.split("/").pop();
 
   const projectName = await input({
     message: "What is the name of your project",
@@ -52,5 +56,5 @@ export default async () => {
     });
   }
 
-  await db.add(projectName, projectPath, windows);
+  await db.add(projectName, expandedPath, windows);
 };
