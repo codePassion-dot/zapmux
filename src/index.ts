@@ -12,7 +12,7 @@ import edit from "./commands/edit";
 import stop from "./commands/stop";
 
 program
-  .version("0.6.2")
+  .version("0.6.3")
   .description(
     chalk.green(figlet.textSync("zapmux CLI", { horizontalLayout: "full" })),
   );
