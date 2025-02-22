@@ -9,14 +9,18 @@ export default async (project: string | undefined) => {
     const runningProjects = projects.filter((project) =>
       runningSessions.includes(project),
     );
-    const projectToChoose = await select({
-      message: "Choose a project",
-      choices: runningProjects.map((project) => ({
-        name: project,
-        value: project,
-      })),
-    });
-    attachToTmuxSession(projectToChoose);
+    if (runningProjects.length === 0) {
+      console.log("No projects running");
+    } else {
+      const projectToChoose = await select({
+        message: "Choose a project",
+        choices: runningProjects.map((project) => ({
+          name: project,
+          value: project,
+        })),
+      });
+      attachToTmuxSession(projectToChoose);
+    }
   } else if (!projects.includes(project)) {
     console.log("Project not found");
   } else if (!runningSessions.includes(project)) {
